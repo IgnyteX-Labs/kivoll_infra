@@ -1,0 +1,32 @@
+services:
+  worker:
+    build:
+      context: ../..
+      dockerfile: prod/Dockerfile
+      args:
+        GIT_REPO: https://github.com/IgnyteX-Labs/kivoll_worker.git
+        GIT_BRANCH: main
+    restart: unless-stopped
+    env_file:
+      - ../.env.worker
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:18
+    env_file:
+      - ../.env.admin
+      - ../.env.worker
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ../common/initdb:/docker-entrypoint-initdb.d:ro
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
