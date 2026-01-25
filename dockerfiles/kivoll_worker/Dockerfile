@@ -1,7 +1,7 @@
 # ---- build kivoll_worker ----
 
 # ---- Builder ----
-FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim AS builder
+FROM ghcr.io/astral-sh/uv:python3.13-trixie-slim AS builder
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends git ca-certificates \
@@ -17,7 +17,7 @@ RUN uv sync --no-dev --frozen
 
 
 # ---- Runtime ----
-FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
+FROM ghcr.io/astral-sh/uv:python3.13-trixie-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
@@ -25,9 +25,8 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 COPY --from=builder /app /app
-COPY deploy/common/healthcheck.sh /usr/local/bin/healthcheck.sh
-RUN chmod +x /usr/local/bin/healthcheck_kivoll_worker.sh
 
-HEALTHCHECK --interval=1m --timeout=10s --start-period=2m --retries=3 CMD /usr/local/bin/healthcheck.sh
+RUN chmod +x deploy/healthcheck.sh
+HEALTHCHECK --interval=1m --timeout=10s --start-period=2m --retries=3 CMD deploy/healthcheck.sh
 
 CMD [ "uv", "run", "kivoll-schedule", "--verbose" ]

@@ -1,3 +1,5 @@
 .env.admin
 .env.worker
 .idea/
+
+.venv/

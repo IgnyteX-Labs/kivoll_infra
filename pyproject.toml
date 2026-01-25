@@ -1,0 +1,48 @@
+[project]
+name = "kivoll_infra"
+version = "0.1.0"
+description = "Infrastructure testing for kivoll"
+authors = [
+    { name = "Qrashi", email = "fritz@vibe.ac" },
+]
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+requires-python = ">=3.11"
+dependencies = [
+    "pytest>=9.0.1",
+    "testcontainers[postgresql]>=4.13.0",
+    "psycopg[binary]>=3.1",
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0",
+    "docker>=7.1.0",
+    "ruff>=0.14.14",
+    "pre-commit>=4.5.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/Qrashi/kivoll"
+Issues = "https://github.com/Qrashi/kivoll/issues"
+Documentation = "https://qrashi.github.io/kivoll/"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short --strict-markers"
+markers = [
+    "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+include = [
+    "README.md"
+]
