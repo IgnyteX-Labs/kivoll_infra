@@ -26,7 +26,11 @@ uv run pytest
 ```
 in the root directory.
 
-Notice regarding max_
+##### Notice regarding ``$TC_MAX_TRIES``
+This is responsible for how long the test suite waits for the database to be ready.
+I set this to a low value because database is quite quick to start up.
+When it isn't it's usually because the database could not be initialized properly.
+**If tests fail but init should be correct, increase this value.**
 
 ### Environment variables
 ###### .env.admin
@@ -41,12 +45,10 @@ Notice regarding max_
 - ``$DB_HOST`` postgres host (``host:port``)
 - ``$DB_DRIVER`` db driver name (right now usually ``postgresql``)
 
-TODO: tests for initdb
 
 ### Database permission model
 ##### Users:
 - **postgres admin**: set via env variables in .env.admin (``$POSTGRES_USER, $POSTGRES_PASSWORD``)
-- # langsameralsveit
 - **worker_owner**: Owner of worker related tables (``NOLOGIN``)
 - **worker_migrator**: User to run migrations with (``$WORKER_MIGRATOR_PASSWORD``)
 - **worker_app**: User to run ``kivoll_worker`` with (``$WORKER_APP_PASSWORD``)
