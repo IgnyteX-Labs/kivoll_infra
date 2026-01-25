@@ -33,12 +33,12 @@ When it isn't it's usually because the database could not be initialized properl
 **If tests fail but init should be correct, increase this value.**
 
 ### Environment variables
-###### .env.admin
+##### .env.admin
 - ``$POSTGRES_USER`` root postgres username
 - ``$POSTGRES_PASSWORD`` root user password
 - ``$POSTGRES_DB`` default postgres database
 
-###### .env.worker / predict / api (for kivoll_worker container)
+##### .env.worker / predict / api (for kivoll_worker container)
 - ``$WORKER/PREDICT/API_MIGRATOR_PASSWORD`` password for ``*_migrator`` user
 - ``$WORKER/PREDICT/API_APP_PASSWORD`` password for ``*_app`` user
 - ``$SCHEDULER_DB_PASSWORD`` password for ``scheduler`` user (only in ``.env.worker``)
@@ -61,17 +61,17 @@ When it isn't it's usually because the database could not be initialized properl
 - **scheduler**: User to run ``kivoll_worker`` scheduler with (``$SCHEDULER_DB_PASSWORD``)
 
 ##### Databases:
-###### worker_db
+##### worker_db
 - ``worker_db`` is owned by ``worker_owner``
 - ``worker_db`` is accessible by ``worker_migrator`` (``DDL``) and ``worker_app`` (``rw``)
 - ``worker_db`` is accessible by ``api_app`` (``ro``)
 
-###### jobs_db
+##### jobs_db
 - ``jobs_db`` is owned by ``api_owner``
 - ``jobs_db`` is accessible by ``api_migrator`` (``DDL``) and ``api_app`` (``rw``)
 - ``jobs_db`` is accessible by ``worker_app`` and ``predict_app`` (``UPDATE, SELECT``)
 
-###### userdata_db (currently not in use)
+##### userdata_db (currently not in use)
 - ``userdata_db`` is owned by ``api_owner``
 - ``userdata_db`` is accessible by ``api_migrator`` (``DDL``) and ``api_app`` (``rw``)
 
