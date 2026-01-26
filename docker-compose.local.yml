@@ -4,7 +4,7 @@ services:
   worker:
     build:
       context: ..
-      dockerfile: dockerfiles/kivoll_worker/Dockerfile
+      dockerfile: kivoll_worker.Dockerfile
       args:
         GIT_REPO: https://github.com/IgnyteX-Labs/kivoll_worker.git
         GIT_BRANCH: main
