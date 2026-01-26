@@ -32,30 +32,6 @@ class BuiltComposeProject(ComposeProject):
     build_result: subprocess.CompletedProcess[str]
 
 
-def create_temp_env_files(temp_dir: Path) -> None:
-    """
-    Create temporary .env files from .env.example templates.
-
-    This is needed for docker-compose config validation since .env files
-    are not committed to the repository.
-
-    Args:
-        temp_dir: Temporary directory where .env files will be created
-    """
-    # Map of .env files to their .env.example sources in project root
-    env_mappings = {
-        ".env.admin": PROJECT_ROOT / ".env.admin.example",
-        ".env.worker": PROJECT_ROOT / ".env.worker.example",
-        ".env.api": PROJECT_ROOT / ".env.api.example",
-        ".env.predict": PROJECT_ROOT / ".env.predict.example",
-    }
-
-    for env_file, example_file in env_mappings.items():
-        if example_file.exists():
-            # Copy example file to temp directory with the expected name
-            shutil.copy(example_file, temp_dir / env_file)
-
-
 def create_temp_compose_project(
     compose_file: Path,
     temp_root: Path,
@@ -69,8 +45,6 @@ def create_temp_compose_project(
     """
     temp_compose_dir = temp_root / compose_file.parent.name
     temp_compose_dir.mkdir(parents=True, exist_ok=True)
-
-    create_temp_env_files(temp_root)
 
     temp_compose = temp_compose_dir / compose_file.name
     if build_context is None:
@@ -185,7 +159,6 @@ class TestDockerComposeValidity:
             temp_root = Path(tmpdir)
             temp_local = temp_root / "local"
             temp_local.mkdir()
-            create_temp_env_files(temp_root)
 
             # Copy docker-compose.yml to temp directory to use temp .env files
             temp_compose = temp_local / "docker-compose.yml"
@@ -216,8 +189,6 @@ class TestDockerComposeValidity:
             temp_prod = temp_root / "prod"
             temp_prod.mkdir()
 
-            # Create .env files in the temp root (parent of prod/)
-            create_temp_env_files(temp_root)
 
             # Copy docker-compose.yml to temp prod directory
             temp_compose = temp_prod / "docker-compose.yml"

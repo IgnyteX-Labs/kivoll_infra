@@ -9,19 +9,34 @@ services:
         GIT_REPO: https://github.com/IgnyteX-Labs/kivoll_worker.git
         GIT_BRANCH: main
     restart: unless-stopped
-    env_file:
-      - ../.env.worker
+    environment:
+      # look in .env.worker.example
+      - WORKER_APP_PASSWORD=workerpass
+      - WORKER_MIGRATOR_PASSWORD=workermigratorpass
+      - SCHEDULER_DB_PASSWORD=schedulerpass
+
+      - DB_HOST=db:5432
+      - DB_DRIVER=postgresql
     depends_on:
       db:
         condition: service_healthy
 
   db:
     image: postgres:18
-    env_file:
-      - ../.env.admin
-      - ../.env.worker
-      - ../.env.api
-      - ../.env.predict
+    environment:
+      # needs variables from all .env files
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=supersecret
+      - POSTGRES_DB=postgres
+      - WORKER_APP_PASSWORD=workerpass
+      - WORKER_MIGRATOR_PASSWORD=workermigratorpass
+      - SCHEDULER_DB_PASSWORD=schedulerpass
+      - DB_HOST=localhost:5432
+      - DB_DRIVER=postgresql
+      - API_APP_PASSWORD=scraperpass
+      - API_MIGRATOR_PASSWORD=schedulerpass
+      - PREDICT_APP_PASSWORD=predictpass
+      - PREDICT_MIGRATOR_PASSWORD=predictmigratorpass
     volumes:
       - pgdata:/var/lib/postgresql
       - ../common/initdb:/docker-entrypoint-initdb.d:ro
