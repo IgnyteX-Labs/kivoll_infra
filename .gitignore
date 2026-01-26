@@ -1,5 +1,8 @@
 .env.admin
 .env.worker
+.env.api
+.env.predict
+.env.full
 .idea/
 
 .venv/

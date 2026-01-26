@@ -2,6 +2,10 @@
 
 This repo contains the infrastructure (docker compose) for kivoll.
 
+To run, either make a copy of every .env file (except .env.full.example) and fill in the values.
+You can also use the .env.full.example to generate a .env file with all the values filled in.
+
+
 Deploy local infrastructure with:
 
 ```bash

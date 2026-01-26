@@ -73,7 +73,7 @@ def create_temp_compose_project(
 @pytest.fixture(scope="class")
 def full_compose_project() -> Generator[ComposeProject, None, None]:
     """Create a temporary compose project for integration-style tests."""
-    compose_file = PROJECT_ROOT / "prod" / "docker-compose.yml"
+    compose_file = PROJECT_ROOT / "docker-compose.yml"
     project_name = f"kivoll_test_{uuid.uuid4().hex[:8]}"
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -130,8 +130,8 @@ class TestDockerComposeValidity:
 
     def test_local_compose_is_valid_yaml(self):
         """Verify local/docker-compose.yml is valid YAML."""
-        compose_file = PROJECT_ROOT / "local" / "docker-compose.yml"
-        assert compose_file.exists(), "local/docker-compose.yml does not exist"
+        compose_file = PROJECT_ROOT / "docker-compose.local.yml"
+        assert compose_file.exists(), "docker-compose.local.yml does not exist"
 
         with open(compose_file) as f:
             data = yaml.safe_load(f)
@@ -141,8 +141,8 @@ class TestDockerComposeValidity:
 
     def test_prod_compose_is_valid_yaml(self):
         """Verify prod/docker-compose.yml is valid YAML."""
-        compose_file = PROJECT_ROOT / "prod" / "docker-compose.yml"
-        assert compose_file.exists(), "prod/docker-compose.yml does not exist"
+        compose_file = PROJECT_ROOT / "docker-compose.yml"
+        assert compose_file.exists(), "docker-compose.yml does not exist"
 
         with open(compose_file) as f:
             data = yaml.safe_load(f)
@@ -152,7 +152,7 @@ class TestDockerComposeValidity:
 
     def test_local_compose_config_validates(self):
         """Verify docker-compose config command succeeds for local."""
-        compose_file = PROJECT_ROOT / "local" / "docker-compose.yml"
+        compose_file = PROJECT_ROOT / "docker-compose.local.yml"
 
         # Create temporary directory with .env files from examples
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -180,25 +180,22 @@ class TestDockerComposeValidity:
 
     def test_prod_compose_config_validates(self):
         """Verify docker-compose config command succeeds for prod."""
-        compose_file = PROJECT_ROOT / "prod" / "docker-compose.yml"
+        compose_file = PROJECT_ROOT / "docker-compose.yml"
 
         # Create temporary directory structure mimicking the project layout
         # prod/docker-compose.yml references ../.env.* files
         with tempfile.TemporaryDirectory() as tmpdir:
             temp_root = Path(tmpdir)
-            temp_prod = temp_root / "prod"
-            temp_prod.mkdir()
 
-
-            # Copy docker-compose.yml to temp prod directory
-            temp_compose = temp_prod / "docker-compose.yml"
+            # Copy docker-compose.yml to temp directory
+            temp_compose = temp_root / "docker-compose.yml"
             shutil.copy(compose_file, temp_compose)
 
             result = subprocess.run(
                 ["docker", "compose", "-f", str(temp_compose), "config"],
                 capture_output=True,
                 text=True,
-                cwd=temp_prod,
+                cwd=temp_root,
             )
 
             # docker-compose config should succeed (exit code 0)
@@ -215,7 +212,7 @@ class TestLocalComposeStructure:
 
     def test_local_compose_has_db_service(self):
         """Verify local compose defines a db service."""
-        compose_file = PROJECT_ROOT / "local" / "docker-compose.yml"
+        compose_file = PROJECT_ROOT / "docker-compose.local.yml"
         with open(compose_file) as f:
             data = yaml.safe_load(f)
 
@@ -223,7 +220,7 @@ class TestLocalComposeStructure:
 
     def test_local_db_service_has_healthcheck(self):
         """Verify db service has a healthcheck configured."""
-        compose_file = PROJECT_ROOT / "local" / "docker-compose.yml"
+        compose_file = PROJECT_ROOT / "docker-compose.local.yml"
         with open(compose_file) as f:
             data = yaml.safe_load(f)
 
@@ -236,7 +233,7 @@ class TestLocalComposeStructure:
 
     def test_local_db_mounts_init_scripts(self):
         """Verify db service mounts the init scripts directory."""
-        compose_file = PROJECT_ROOT / "local" / "docker-compose.yml"
+        compose_file = PROJECT_ROOT / "docker-compose.local.yml"
         with open(compose_file) as f:
             data = yaml.safe_load(f)
 
@@ -256,7 +253,7 @@ class TestLocalComposeStructure:
 
     def test_local_db_uses_correct_image(self):
         """Verify db service uses the correct PostgreSQL image."""
-        compose_file = PROJECT_ROOT / "local" / "docker-compose.yml"
+        compose_file = PROJECT_ROOT / "docker-compose.local.yml"
         with open(compose_file) as f:
             data = yaml.safe_load(f)
 
@@ -268,7 +265,7 @@ class TestLocalComposeStructure:
 
     def test_local_worker_depends_on_db_health(self):
         """Verify worker service has proper depends_on with health condition."""
-        compose_file = PROJECT_ROOT / "local" / "docker-compose.yml"
+        compose_file = PROJECT_ROOT / "docker-compose.local.yml"
         with open(compose_file) as f:
             data = yaml.safe_load(f)
 
@@ -294,7 +291,7 @@ class TestProdComposeStructure:
 
     def test_prod_compose_has_db_service(self):
         """Verify prod compose defines a db service."""
-        compose_file = PROJECT_ROOT / "prod" / "docker-compose.yml"
+        compose_file = PROJECT_ROOT / "docker-compose.yml"
         with open(compose_file) as f:
             data = yaml.safe_load(f)
 
@@ -302,7 +299,7 @@ class TestProdComposeStructure:
 
     def test_prod_db_service_has_healthcheck(self):
         """Verify prod db service has a healthcheck configured."""
-        compose_file = PROJECT_ROOT / "prod" / "docker-compose.yml"
+        compose_file = PROJECT_ROOT / "docker-compose.yml"
         with open(compose_file) as f:
             data = yaml.safe_load(f)
 
@@ -311,7 +308,7 @@ class TestProdComposeStructure:
 
     def test_prod_db_mounts_init_scripts(self):
         """Verify prod db service mounts the init scripts directory."""
-        compose_file = PROJECT_ROOT / "prod" / "docker-compose.yml"
+        compose_file = PROJECT_ROOT / "docker-compose.yml"
         with open(compose_file) as f:
             data = yaml.safe_load(f)
 

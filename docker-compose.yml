@@ -3,7 +3,7 @@ name: kivoll infrastructure (prod)
 services:
   worker:
     build:
-      context: ../..
+      context: ..
       dockerfile: dockerfiles/kivoll_worker/Dockerfile
       args:
         GIT_REPO: https://github.com/IgnyteX-Labs/kivoll_worker.git
