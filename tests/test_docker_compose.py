@@ -41,7 +41,7 @@ def create_temp_compose_project(
     Create a temporary compose project layout without touching the repo root.
 
     This copies the compose file, generates .env files from examples in temp_root,
-    and mirrors common/initdb so volume paths resolve correctly.
+    and mirrors initdb so volume paths resolve correctly.
     """
     temp_compose_dir = temp_root / compose_file.parent.name
     temp_compose_dir.mkdir(parents=True, exist_ok=True)
@@ -63,9 +63,9 @@ def create_temp_compose_project(
         with open(temp_compose, "w") as f:
             yaml.safe_dump(data, f, sort_keys=False)
 
-    temp_initdb = temp_root / "common" / "initdb"
+    temp_initdb = temp_root / "initdb"
     temp_initdb.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(PROJECT_ROOT / "common" / "initdb", temp_initdb)
+    shutil.copytree(PROJECT_ROOT / "initdb", temp_initdb)
 
     return temp_compose
 
@@ -248,7 +248,7 @@ class TestLocalComposeStructure:
                 break
 
         assert init_mount is not None, "db service does not mount init scripts"
-        assert "../common/initdb" in init_mount, "Init scripts mount path incorrect"
+        assert "./initdb" in init_mount, "Init scripts mount path incorrect"
         assert ":ro" in init_mount, "Init scripts should be mounted read-only"
 
     def test_local_db_uses_correct_image(self):

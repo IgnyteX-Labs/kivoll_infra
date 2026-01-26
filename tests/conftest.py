@@ -49,7 +49,7 @@ def test_env() -> dict[str, str]:
 
 @pytest.fixture(scope="session")
 def init_result(test_env: dict[str, str]) -> InitResult:
-    init_scripts_path = Path(__file__).parent.parent / "common" / "initdb"
+    init_scripts_path = Path(__file__).parent.parent / "initdb"
 
     postgres = PostgresContainer(
         image="postgres:18",
@@ -97,7 +97,7 @@ def postgres_container(
             "Container failed to initialise; skipping tests that require postgres_container."
         )
     # Get the path to the init scripts
-    init_scripts_path = Path(__file__).parent.parent / "common" / "initdb"
+    init_scripts_path = Path(__file__).parent.parent / "initdb"
 
     # Create the container and configure it
     postgres = PostgresContainer(

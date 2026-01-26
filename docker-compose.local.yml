@@ -39,7 +39,7 @@ services:
       - PREDICT_MIGRATOR_PASSWORD=predictmigratorpass
     volumes:
       - pgdata:/var/lib/postgresql
-      - ../common/initdb:/docker-entrypoint-initdb.d:ro
+      - ./initdb:/docker-entrypoint-initdb.d:ro
     restart: unless-stopped
     command: [ "postgres", "-c", "log_statement=all" ]
     ports:
