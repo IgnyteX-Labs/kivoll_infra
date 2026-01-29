@@ -34,8 +34,10 @@ python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-v --tb=short --strict-markers"
 markers = [
-    "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "database: build and initialise the database image/container",
+    "integration: database schema/permissions validation",
+    "compose: docker-compose structure and validation",
+    "full: full docker-compose up/down instance test",
 ]
 
 [build-system]

@@ -2,6 +2,8 @@
 Pytest fixtures for database integration tests.
 """
 
+pytest_plugins = ["tests.test_db_image"]
+
 import os
 
 os.environ["TC_MAX_TRIES"] = "10"
@@ -9,24 +11,15 @@ os.environ["TC_MAX_TRIES"] = "10"
 # (10 tries * 1 second interval)
 # db service will usually not take longer than that
 
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Generator
-
 import pytest
 from dotenv import load_dotenv
-from testcontainers.postgres import PostgresContainer
+from testcontainers.core.container import DockerContainer
 import psycopg
 
 # Load test environment variables
 TEST_ENV_PATH = Path(__file__).parent / ".env.test"
 load_dotenv(TEST_ENV_PATH)
-
-
-@dataclass(frozen=True)
-class InitResult:
-    ok: bool
-    logs: str = ""
 
 
 @pytest.fixture(scope="session")
@@ -48,82 +41,8 @@ def test_env() -> dict[str, str]:
 
 
 @pytest.fixture(scope="session")
-def init_result(test_env: dict[str, str]) -> InitResult:
-    init_scripts_path = Path(__file__).parent.parent / "initdb"
-
-    postgres = PostgresContainer(
-        image="postgres:18",
-        username=test_env["POSTGRES_USER"],
-        password=test_env["POSTGRES_PASSWORD"],
-        dbname=test_env["POSTGRES_DB"],
-    )
-
-    for key, value in test_env.items():
-        if value:  # Only set non-None values
-            postgres = postgres.with_env(key, value)
-
-    # Mount the init scripts directory
-    postgres = postgres.with_volume_mapping(
-        str(init_scripts_path.absolute()), "/docker-entrypoint-initdb.d", mode="ro"
-    )
-
-    try:
-        postgres.start()
-    except TimeoutError:
-        logs = ""
-        try:
-            logs = postgres.get_logs()
-        except Exception:
-            pass
-        return InitResult(ok=False, logs=logs)
-    finally:
-        try:
-            postgres.stop()
-        except Exception:
-            pass
-    return InitResult(ok=True)
-
-
-@pytest.fixture(scope="session")
-def postgres_container(
-    test_env: dict[str, str], init_result: InitResult
-) -> Generator[PostgresContainer, None, None]:
-    """
-    Start a PostgreSQL container with init scripts mounted.
-    This fixture is session-scoped to reuse the container across tests.
-    """
-    if not init_result.ok:
-        pytest.skip(
-            "Container failed to initialise; skipping tests that require postgres_container."
-        )
-    # Get the path to the init scripts
-    init_scripts_path = Path(__file__).parent.parent / "initdb"
-
-    # Create the container and configure it
-    postgres = PostgresContainer(
-        image="postgres:18",
-        username=test_env["POSTGRES_USER"],
-        password=test_env["POSTGRES_PASSWORD"],
-        dbname=test_env["POSTGRES_DB"],
-    )
-
-    # Set environment variables for the init scripts BEFORE mounting volume
-    for key, value in test_env.items():
-        if value:  # Only set non-None values
-            postgres = postgres.with_env(key, value)
-
-    # Mount the init scripts directory
-    postgres = postgres.with_volume_mapping(
-        str(init_scripts_path.absolute()), "/docker-entrypoint-initdb.d", mode="ro"
-    )
-
-    with postgres:
-        yield postgres
-
-
-@pytest.fixture(scope="session")
 def db_admin_connection(
-    postgres_container: PostgresContainer, test_env: dict[str, str]
+    postgres_container: DockerContainer, test_env: dict[str, str]
 ):
     """Provide an admin database connection."""
     # Get connection parameters directly instead of using the URL
@@ -144,7 +63,7 @@ def db_admin_connection(
 
 
 @pytest.fixture
-def db_connection_factory(postgres_container: PostgresContainer):
+def db_connection_factory(postgres_container: DockerContainer):
     """
     Factory fixture to create database connections for specific users/databases.
 
@@ -180,7 +99,7 @@ def db_connection_factory(postgres_container: PostgresContainer):
 
 
 @pytest.fixture
-def test_credentials(test_env: dict[str, str]) -> dict[str, str]:
+def test_credentials(test_env: dict[str, str]) -> dict[str, dict[str, str]]:
     """Provide test credentials for all roles."""
     return {
         "admin": {

@@ -2,15 +2,10 @@ name: kivoll infrastructure (prod)
 
 services:
   worker:
-    build:
-      context: .
-      dockerfile: kivoll_worker.Dockerfile
-      args:
-        GIT_REPO: https://github.com/IgnyteX-Labs/kivoll_worker.git
-        GIT_BRANCH: main
+    image: ghcr.io/ignytex-labs/kivoll_worker:0.1.0
     restart: unless-stopped
     environment:
-      # look in .env.worker.example
+      # variables needed for wore
       - WORKER_APP_PASSWORD=workerpass
       - WORKER_MIGRATOR_PASSWORD=workermigratorpass
       - SCHEDULER_DB_PASSWORD=schedulerpass
@@ -22,7 +17,9 @@ services:
         condition: service_healthy
 
   db:
-    image: postgres:18
+    image: ghcr.io/ignytex-labs/kivoll_db:0.1.0
+    volumes:
+      - pgdata:/var/lib/postgresql
     environment:
       # needs variables from all .env files
       - POSTGRES_USER=postgres
@@ -37,16 +34,7 @@ services:
       - API_MIGRATOR_PASSWORD=schedulerpass
       - PREDICT_APP_PASSWORD=predictpass
       - PREDICT_MIGRATOR_PASSWORD=predictmigratorpass
-    volumes:
-      - pgdata:/var/lib/postgresql
-      - ./initdb:/docker-entrypoint-initdb.d:ro
     restart: unless-stopped
-    healthcheck:
-      test: >
-        pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
 volumes:
   pgdata:
