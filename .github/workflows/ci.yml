@@ -1,9 +1,9 @@
 name: ci.yml
 on:
   push:
-    branches-ignore: ["main"]
+    branches-ignore: [ "main" ]
   pull_request:
-    branches: ["main"]
+    branches: [ "main" ]
 
 jobs:
   run-integration-tests:
