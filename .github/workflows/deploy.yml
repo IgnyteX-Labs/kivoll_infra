@@ -7,7 +7,7 @@ on:
 jobs:
 
   test:
-    uses: ignytex-labs/kivoll_infra/.github/workflows/test.yml@main
+    uses: ./.github/workflows/test.yml
 
   deploy-db-image:
     needs: test

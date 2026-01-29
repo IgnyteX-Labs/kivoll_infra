@@ -1,0 +1,10 @@
+name: ci.yml
+on:
+  push:
+    branches-ignore: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  run-integration-tests:
+    uses: ./.github/workflows/test.yml
