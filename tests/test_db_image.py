@@ -153,7 +153,9 @@ def built_db_image(db_image_tag: str, custom_db_image_validated: None) -> Genera
 @pytest.fixture(scope="session")
 def init_result(built_db_image: BuiltImage, test_env: dict[str, str]) -> InitResult:
     if not built_db_image.ok:
-        return InitResult(ok=False, logs="Image build failed")
+        return InitResult(ok=False, logs=f"Image build failed "
+                                         f"\nSTDOUT:{built_db_image.stdout}"
+                                         f"\nSTDERR:{built_db_image.stderr}")
     container = _build_container(built_db_image.tag, test_env)
     logs = ""
     try:
