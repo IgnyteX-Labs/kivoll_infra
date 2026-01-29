@@ -2,7 +2,7 @@ name: kivoll infrastructure (prod)
 
 services:
   worker:
-    image: ghcr.io/ignytex-labs/kivoll_worker:0.1.0
+    image: ghcr.io/ignytex-labs/kivoll_worker:v0.1.0
     restart: unless-stopped
     environment:
       # variables needed for wore
