@@ -137,7 +137,6 @@ class TestComposeStructure:
 
 
 @pytest.mark.full
-@pytest.mark.skip
 @pytest.mark.usefixtures("compose_validated", "compose_config_validated")
 class TestDockerComposeFullInstance:
     """Test the full compose stack with custom DB image."""
