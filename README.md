@@ -13,7 +13,25 @@ docker-compose -f local/docker-compose.yml up -d
 ```
 
 As of right now, it is more a place to store the files
-so that I dont forget them.
+so that I don't forget them.
+
+### Kivoll database
+The kivoll database lives in this repo.
+This is mostly the database schema and initialization scripts.
+
+#### Relevant files
+##### init scripts
+Database will be initialized with scripts under ``db/initdb/*.sh``
+
+##### VERSION
+The ``db/VERSION`` file contains the current version of the db docker image.
+The ``deploy.yml`` workflow will check if this file has changed and trigger a
+deploy if required. <br>
+**This file needs to be changed manually to release**
+
+### Database management
+To manage the database, use the [``kivoll-belay`` container](https://github.com/ignytex-labs/kivoll_belay). 
+This container will not start by default.
 
 ### Services
 - [kivoll_api](https://github.com/ignyteX-Labs/kivoll_api): API service for kivoll (golang/chi)
